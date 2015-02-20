@@ -61,7 +61,9 @@ def main(argv=None):
                       help="bamfile")
 
     parser.add_option("-a", "--aligner", dest="aligner", type="string",
-                      help="bamfile", default="bwa")
+                      help="Algorithm used to align the reads - "
+                           "supported aligners are: "
+                           "bwa and gsnap", default="must_specify")
 
     parser.add_option("-r", "--output-report", type="string", dest="report",
                       help="bamfile", default="")
@@ -72,8 +74,15 @@ def main(argv=None):
     # add common options (-h/--help, ...) and parse command line
     (options, args) = E.Start(parser, argv=argv, add_output_options=True)
 
-    # Check the aligner is supported
-    if options.aligner != "bwa":
+    # Check the aligner is specified supported
+    supported_aligners = ["bwa", "gsnap"]
+    if options.aligner == "must_specify":
+        raise ValueError("please specify a supported aligner. "
+                         "supported aligners: " 
+                         "%s" ", ".join( supported_aligners ))
+                          
+
+    if options.aligner not in supported_aligners:
         raise ValueError(
             "Currently only bwa is supported as aligner specific flags are used")
 
@@ -92,15 +101,24 @@ def main(argv=None):
             tagd = dict(read.tags)
             u, b, key = False, False, read.qname
 
-            if tagd["XT"] == "U":
-                u = True
-                uniq_map[key] = 1
+            if options.aligner == "bwa":
+                if tagd["XT"] == "U":
+                    u = True
+                    uniq_map[key] = 1
 
-            if "X0" in tagd:
-                if tagd["X0"] == 1:
+                if "X0" in tagd:
+                    if tagd["X0"] == 1:
+                        b = True
+                        best_map[key] = 1
+
+            if options.aligner == "gsnap":
+                if tagd["X2"] == 0:
+                    u = True
+                    uniq_map[key] = 1
+                if tagd["XQ"] > tagd["X2"]:
                     b = True
-                    best_map[key] = 1
-
+                    nest_map[key] = 1
+                         
             if u is True or b is True:
                 uORb_map[key] = 1
 
