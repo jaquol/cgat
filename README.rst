@@ -34,7 +34,7 @@ strip sequence and quality information from a bam_ file, type:
 
    cgat bam2bam --strip=sequence < in.bam > out.bam
 
-CGAT Pipelines
+CGAT Pipelines 
 ==============
 
 We have developed numerous pipelines in comparative genomics
