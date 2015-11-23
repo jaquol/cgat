@@ -2,7 +2,7 @@
     :target: https://travis-ci.org/CGATOxford/cgat
 
 ===========================
-The CGAT code collection 
+The CGAT code collection
 ===========================
 
 The CGAT code collection has grown out of the work in comparative
